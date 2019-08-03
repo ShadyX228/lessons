@@ -1,6 +1,5 @@
 /*
  * args[0]-args[4]: driver, url, username, password, db name
- * Example: java Main "jdbc:mysql" "localhost" "root" "12345" "sgt"
  *
  * v.0.1
  *
@@ -8,7 +7,6 @@
  */
 
 import java.sql.*;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
@@ -21,14 +19,6 @@ public class Main {
         }
         testDatabase.createDatabase();
         testDatabase.createTables();
-
-        System.out.println("Enter operation type and table name.\n " +
-                "Allowed variants for operation type:\n " +
-                "select, insert, delete, update.\n" +
-                "For table name: student, teacher, group.");
-        Scanner in = new Scanner(System.in);
-        String operation = in.next();
-        String table = in.next();
-        testDatabase.executeOperation(operation, table);
+        //testDatabase.executeOperation("delete", "student");
     }
 }
