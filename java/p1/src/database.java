@@ -137,6 +137,9 @@ public class database {
      *                  Регистр не имеет значения.
      *                  Если введено некорректное значение,
      *                  пользователь получает об этом уведомление.
+     *
+     * @param table - определяет таблицу, с которой будет производиться операция
+     *              Возможные значения: student, teacher, group.
      * @throws SQLException
      */
     public void executeOperation(String operationType, String table) throws SQLException {
@@ -242,7 +245,7 @@ public class database {
                     }
                     statement.close();
                 } else if (table.equals("groupteacher")) {
-                    System.out.println("Count how many teachers teach given group id (int).");
+                    System.out.println("Count how many teachers teach group with given id (int).");
 
                     String query = "SELECT COUNT(*) " +
                             "FROM " + dbname + ".groupteacher " +

@@ -1,10 +1,11 @@
 /*
  * args[0]-args[4]: driver, url, username, password, db name
- * Example: java Main "jdbc:mysql" "localhost" "root" "12345" "sgt"
+ * Пример: java Main "jdbc:mysql" "localhost" "root" "12345" "sgt"
  *
  * v.0.1
  *
- * Tested with XAMPP v3.2.2., MySQL 10.1.37-MariaDB, mysql-connector-java-8.0.16
+ * Протестировано с XAMPP v3.2.2., MySQL 10.1.37-MariaDB, mysql-connector-java-8.0.16
+ * Коннектор поместить в CLASSPATH
  *
  * Petrovich incorporated. All rights reserved.
  */
@@ -17,9 +18,14 @@ public class Main {
         database testDatabase;
         if(args.length == 0) {
             testDatabase = new database();
-        }
-        else {
-            testDatabase = new database(args[0], args[1], args[2], args[3], args[4]);
+        } else {
+            testDatabase = new database(
+                    args[0],
+                    args[1],
+                    args[2],
+                    args[3],
+                    args[4]
+            );
         }
         testDatabase.createDatabase();
         testDatabase.createTables();
