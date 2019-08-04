@@ -4,6 +4,8 @@
  *
  * v.0.1
  *
+ * Tested with XAMPP v3.2.2., MySQL 10.1.37-MariaDB, mysql-connector-java-8.0.16
+ *
  * Petrovich incorporated. All rights reserved.
  */
 
