@@ -10,20 +10,23 @@ import java.util.Scanner;
  */
 
 public class database {
-    database(){
+    database() throws SQLException {
         this.driver = "jdbc:mysql";
         this.url = driver + "://" + "localhost/";
         this.user = "root";
         this.password = "12345";
         this.dbname = "studentgroupteacher";
         System.out.println("Using default connection data.");
+        this.createDatabase();
     }
-    database(String driver, String url, String user, String password, String dbname) {
+    database(String driver, String url, String user,
+             String password, String dbname) throws SQLException {
         this.driver = driver;
         this.url = driver + "://" + url;
         this.user = user;
         this.password = password;
         this.dbname = dbname;
+        this.createDatabase();
     }
 
     /**
@@ -33,7 +36,7 @@ public class database {
      *
      * @throws SQLException
      */
-    public void createDatabase() throws SQLException{
+    private void createDatabase() throws SQLException{
 
         try (Connection connection = DriverManager.getConnection(url, user, password);
              Statement CreateStatement = connection.createStatement()) {
@@ -45,6 +48,7 @@ public class database {
                         "\" is already exists.");
             } else {
                 System.out.println(" Success.");
+                this.createTables();
             }
         }
     }
@@ -55,7 +59,7 @@ public class database {
      *
      * @throws SQLException
      */
-    public void createTables() throws SQLException {
+    private void createTables() throws SQLException {
 
         try (Connection connection = DriverManager.getConnection(url, user, password)) {
             System.out.print("Creating tables. ");
@@ -347,6 +351,180 @@ public class database {
             }
         }
     }
+
+    public void executeInsertion(String table) throws SQLException {
+        try(Connection connection = DriverManager.getConnection(url, user, password)) {
+            System.out.println("Inserting in table \"" + table + "\"");
+
+            if (table.equals("student")) {
+                System.out.println("Enter name (String), birthday (YYYY-MM-dd), group id: ");
+
+                String query = "INSERT INTO " + dbname + ".student " +
+                        "(student_id, Name, Birthday, Sex, group_id) " +
+                        "VALUES (NULL, ?, ?, NULL, ?)";
+                PreparedStatement statement = connection.prepareStatement(query);
+
+                Scanner in = new Scanner(System.in);
+                String name = in.nextLine();
+                String birthday = in.nextLine();
+                int groupId = in.nextInt();
+
+                statement.setString(1, name);
+                statement.setDate(2, Date.valueOf(birthday));
+                statement.setInt(3, groupId);
+
+                statement.executeUpdate();
+                in.close();
+                statement.close();
+            } else if (table.equals("teacher")) {
+                System.out.println("Enter name (String), birthday (YYYY-MM-dd): ");
+
+                String query = "INSERT INTO " + dbname + ".teacher " +
+                        "(teacher_id, Name, Birthday, Sex) " +
+                        "VALUES (NULL, ?, ?, NULL)";
+                PreparedStatement statement = connection.prepareStatement(query);
+
+                Scanner in = new Scanner(System.in);
+                String name = in.nextLine();
+                String birthday = in.nextLine();
+
+                statement.setString(1, name);
+                statement.setDate(2, Date.valueOf(birthday));
+
+                statement.executeUpdate();
+                in.close();
+                statement.close();
+            } else if(table.equals("group")) {
+                System.out.println("Enter number of group (int): ");
+
+                String query = "INSERT INTO " + dbname + ".group " +
+                        "(group_id, Number) " +
+                        "VALUES (NULL, ?)";
+                PreparedStatement statement = connection.prepareStatement(query);
+
+                Scanner in = new Scanner(System.in);
+                int group_id = in.nextInt();
+
+                statement.setInt(1, group_id);
+
+                statement.executeUpdate();
+                in.close();
+                statement.close();
+            } else if(table.equals("groupteacher")) {
+                System.out.println("Enter number of group (int), teacher id (int): ");
+
+                String query = "INSERT INTO + " + dbname + ".groupteacher " +
+                        "(id, group_id, teacher_id) " +
+                        "VALUES (NULL, ?, ?);";
+                PreparedStatement statement = connection.prepareStatement(query);
+
+                Scanner in = new Scanner(System.in);
+                int group_id = in.nextInt();
+                int teacher_id = in.nextInt();
+
+                statement.setInt(1, group_id);
+                statement.setInt(2, teacher_id);
+
+                statement.executeUpdate();
+                in.close();
+                statement.close();
+            } else {
+                System.out.println("Can't execute operation. Select another table.");
+            }
+        }
+    }
+
+    public void executeSelection(String table) throws SQLException {
+        try(Connection connection = DriverManager.getConnection(url, user, password)) {
+            System.out.println("Count all " + table + "s from table \"" +
+                    table + "\" " + "with given birtday.");
+
+            String query = "SELECT COUNT(*) FROM " + dbname + "." +
+                    table + " WHERE " + table + ".birthday = ?";
+
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            Scanner in = new Scanner(System.in);
+            String birthday = in.nextLine();
+
+            statement.setString(1, birthday);
+
+            ResultSet result = statement.executeQuery();
+            while(result.next()) {
+                System.out.println(result.getInt(1));
+            }
+            in.close();
+            statement.close();
+        }
+    }
+
+    public void executeUpdate(String table) throws SQLException {
+        try(Connection connection = DriverManager.getConnection(url, user, password)) {
+
+            if(((table.equals("student")) || (table.equals("teacher")))) {
+                System.out.println("Updating " + table + "'s name (String) by given id (int).");
+
+                String query = "UPDATE " + dbname + "." + table + " SET Name = ? WHERE " + table + "." + table + "_id = ?;";
+
+                PreparedStatement statement = connection.prepareStatement(query);
+
+                Scanner in = new Scanner(System.in);
+                String name = in.nextLine();
+                int id = in.nextInt();
+
+                statement.setString(1, name);
+                statement.setInt(2, id);
+
+                statement.executeUpdate();
+                in.close();
+                statement.close();
+
+            } else if (table.equals("group")) {
+                System.out.println("Updating group number by given group id (int).");
+
+                String query = "UPDATE " + dbname + ".group SET Number = ? WHERE group.group_id = ?;";
+
+                PreparedStatement statement = connection.prepareStatement(query);
+
+                Scanner in = new Scanner(System.in);
+                int number = in.nextInt();
+                int id = in.nextInt();
+
+                statement.setInt(1, number);
+                statement.setInt(2, id);
+
+                statement.executeUpdate();
+                in.close();
+                statement.close();
+            } else {
+                System.out.println("Can't execute operation. Select another table.");
+            }
+        }
+    }
+
+    public void executeDelete(String table) throws SQLException {
+        try(Connection connection = DriverManager.getConnection(url, user, password)) {
+            if(!table.equalsIgnoreCase("groupteacher")) {
+                System.out.println("Delete row in table \"" + table + "\" with given id (int):");
+
+                String query = "DELETE FROM " + dbname + "." + table + " WHERE " + table + "." + table + "_id = ?;";
+
+                PreparedStatement statement = connection.prepareStatement(query);
+
+                Scanner in = new Scanner(System.in);
+                int id = in.nextInt();
+
+                statement.setInt(1, id);
+
+                statement.executeUpdate();
+                in.close();
+                statement.close();
+            }
+        }
+    }
+
+
+
 
     private String driver;
     private String url;
