@@ -27,16 +27,14 @@ public class Main {
                     args[4]
             );
         }
-        testDatabase.createDatabase();
-        testDatabase.createTables();
 
-        System.out.println("\nEnter operation type and table name. " +
-                "Allowed variants for operation type:\n" +
-                "select, insert, delete, update.\n" +
-                "For table name: student, teacher, group.");
+        System.out.println("\nEnter table name. " +
+                "Allowed variants for table name: student, teacher, group.");
         Scanner in = new Scanner(System.in);
-        String operation = in.next();
         String table = in.next();
-        testDatabase.executeOperation(operation, table);
+
+        testDatabase.executeUpdate(table);
+
+        in.close();
     }
 }
