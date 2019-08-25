@@ -10,7 +10,6 @@
  */
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -29,9 +28,13 @@ public class Main {
             );
         }
 
+        String method;
+        Scanner in = new Scanner(System.in);
 
+        System.out.println("Enter method name: ");
+        method = in.next();
 
-        testDatabase.execute("deleteRow");
+        testDatabase.execute(method);
 
 
     }

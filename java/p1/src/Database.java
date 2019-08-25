@@ -11,7 +11,7 @@ import java.util.Scanner;
  * @author ShadyX228
  */
 
-public class Database {
+public class Database<thorw> {
     private String driver;
     private String url;
     private String user;
@@ -19,7 +19,7 @@ public class Database {
     private String dbname;
 
 
-    Database() throws SQLException {
+    Database() throws SQLException, IllegalAccessException {
         this.driver = "jdbc:mysql";
         this.url = driver + "://" + "localhost/";
         this.user = "root";
@@ -27,30 +27,19 @@ public class Database {
         this.dbname = "studentgroupteacher";
         System.out.println("Using default connection data.");
 
-        Connection connection = DriverManager.getConnection(
-                url,
-                user,
-                password
-        );
-        this.createDatabase(connection);
-        connection.close();
+        execute("createDatabase");
     }
 
     Database(String driver, String url, String user,
-             String password, String dbname) throws SQLException {
+             String password, String dbname)
+            throws SQLException, IllegalAccessException {
         this.driver = driver;
         this.url = driver + "://" + url;
         this.user = user;
         this.password = password;
         this.dbname = dbname;
 
-        Connection connection = DriverManager.getConnection(
-                url,
-                user,
-                password
-        );
-        this.createDatabase(connection);
-        connection.close();
+        execute("createDatabase");
     }
 
 
@@ -61,6 +50,7 @@ public class Database {
      *
      * @throws SQLException
      */
+    @withConnection
     private void createDatabase(Connection connection) throws SQLException{
             Statement CreateStatement = connection.createStatement();
             String createDB = "CREATE DATABASE IF NOT EXISTS " + dbname;
@@ -114,14 +104,12 @@ public class Database {
                     "ADD INDEX(group_id);";
             Statement Statement = connection.createStatement();
 
-
             System.out.print("Creating tables. ");
             Statement.executeUpdate(Student);
             Statement.executeUpdate(Teacher);
             Statement.executeUpdate(Group);
             Statement.executeUpdate(GroupTeacher);
             System.out.println("Tables created.");
-
 
             System.out.print("Establishing links. ");
             // Student-Group
@@ -146,8 +134,7 @@ public class Database {
                     "REFERENCES " + dbname + ".teacher(teacher_id) " +
                     "ON DELETE RESTRICT ON UPDATE RESTRICT;";
             Statement.executeUpdate(link);
-            System.out.print("Links established.");
-
+            System.out.println("Links established.");
 
             Statement.close();
     }
@@ -159,27 +146,20 @@ public class Database {
                 "VALUES (NULL, ?, ?, NULL, ?)";
         PreparedStatement statement = connection.prepareStatement(query);
         Scanner in = new Scanner(System.in);
-        String name;
-        String birthday;
-        int groupId;
-
 
         System.out.println("Inserting in table \"student\"");
         System.out.println("Enter name (String), birthday (YYYY-MM-dd), group id: ");
 
-
-        name = in.nextLine();
-        birthday = in.nextLine();
-        groupId = in.nextInt();
-
+        String name = in.nextLine();
+        String birthday = in.nextLine();
+        int groupId = in.nextInt();
 
         statement.setString(1, name);
         statement.setDate(2, Date.valueOf(birthday));
         statement.setInt(3, groupId);
 
         statement.executeUpdate();
-        in.close();
-        statement.close();
+        endingOperation(statement, in);
     }
 
     @withConnection
@@ -188,26 +168,19 @@ public class Database {
                 "(teacher_id, Name, Birthday, Sex) " +
                 "VALUES (NULL, ?, ?, NULL)";
         PreparedStatement statement = connection.prepareStatement(query);
-        String name;
-        String birthday;
-
 
         System.out.println("Inserting in table \"teacher\"");
         System.out.println("Enter name (String), birthday (YYYY-MM-dd): ");
 
-
         Scanner in = new Scanner(System.in);
-        name = in.nextLine();
-        birthday = in.nextLine();
-
+        String name = in.nextLine();
+        String birthday = in.nextLine();
 
         statement.setString(1, name);
         statement.setDate(2, Date.valueOf(birthday));
 
-
         statement.executeUpdate();
-        in.close();
-        statement.close();
+        endingOperation(statement, in);
     }
 
     @withConnection
@@ -217,18 +190,14 @@ public class Database {
                 "VALUES (NULL, ?)";
         PreparedStatement statement = connection.prepareStatement(query);
         Scanner in = new Scanner(System.in);
-        int groupId;
-
 
         System.out.println("Inserting in table \"teacher\".");
         System.out.println("Enter number of group (int): ");
-        groupId = in.nextInt();
+        int groupId = in.nextInt();
         statement.setInt(1, groupId);
 
-
         statement.executeUpdate();
-        in.close();
-        statement.close();
+        endingOperation(statement, in);
     }
 
     @withConnection
@@ -237,23 +206,19 @@ public class Database {
                 "WHERE student.birthday = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         Scanner in = new Scanner(System.in);
-        String birthday;
-
 
         System.out.println("Count all students from table " +
                 "with given birtday.");
 
-
-        birthday = in.nextLine();
+        String birthday = in.nextLine();
         statement.setString(1, birthday);
-
 
         ResultSet result = statement.executeQuery();
         while(result.next()) {
             System.out.println(result.getInt(1));
         }
-        in.close();
-        statement.close();
+
+        endingOperation(statement, in);
     }
 
     @withConnection
@@ -262,23 +227,19 @@ public class Database {
                 "WHERE teacher.birthday = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         Scanner in = new Scanner(System.in);
-        String birthday;
-
 
         System.out.println("Count all teachers from table " +
                 "with given birthday.");
 
-
-        birthday = in.nextLine();
+        String birthday = in.nextLine();
         statement.setString(1, birthday);
-
 
         ResultSet result = statement.executeQuery();
         while(result.next()) {
             System.out.println(result.getInt(1));
         }
-        in.close();
-        statement.close();
+
+        endingOperation(statement, in);
     }
 
     @withConnection
@@ -289,25 +250,19 @@ public class Database {
                 updatedColumn + "= ? WHERE student." + criterion + "= ?;";
         PreparedStatement statement = connection.prepareStatement(query);
         Scanner in = new Scanner(System.in);
-        String updateColumnValue;
-        String criterionValue;
-
 
         System.out.println("Updating column \"" +
                 updatedColumn + "\" in table \"student\" by \"" + criterion + "\".");
 
-
         System.out.println("Enter updated column value: ");
-        updateColumnValue = in.nextLine();
+        String updateColumnValue = in.nextLine();
         System.out.println("Enter criterion value: ");
-        criterionValue = in.nextLine();
+        String criterionValue = in.nextLine();
         statement.setString(1,updateColumnValue);
         statement.setString(2, criterionValue);
 
-
         statement.executeUpdate();
-        in.close();
-        statement.close();
+        endingOperation(statement, in);
     }
 
     @withConnection
@@ -318,25 +273,19 @@ public class Database {
                 updatedColumn + "= ? WHERE teacher." + criterion + "= ?;";
         PreparedStatement statement = connection.prepareStatement(query);
         Scanner in = new Scanner(System.in);
-        String updateColumnValue;
-        String criterionValue;
-
 
         System.out.println("Updating column \"" +
                 updatedColumn + "\" in table \"teacher\" by \"" + criterion + "\".");
 
-
         System.out.println("Enter updated column value: ");
-        updateColumnValue = in.nextLine();
+        String updateColumnValue = in.nextLine();
         System.out.println("Enter criterion value: ");
-        criterionValue = in.nextLine();
+        String criterionValue = in.nextLine();
         statement.setString(1,updateColumnValue);
         statement.setString(2, criterionValue);
 
-
         statement.executeUpdate();
-        in.close();
-        statement.close();
+        endingOperation(statement, in);
     }
 
     @withConnection
@@ -344,23 +293,16 @@ public class Database {
         String query = "UPDATE " + dbname + ".group SET Number = ? WHERE group.group_id = ?;";
         PreparedStatement statement = connection.prepareStatement(query);
         Scanner in = new Scanner(System.in);
-        int number;
-        int id;
-
-
         System.out.println("Updating group number by given group id (int).");
 
-
-        number = in.nextInt();
-        id = in.nextInt();
+        int number = in.nextInt();
+        int id = in.nextInt();
 
         statement.setInt(1, number);
         statement.setInt(2, id);
 
-
         statement.executeUpdate();
-        in.close();
-        statement.close();
+        endingOperation(statement, in);
     }
 
     @withConnection
@@ -372,22 +314,23 @@ public class Database {
             String query = "DELETE FROM " + dbname + "." + table + " WHERE " + table + "." + criterion + " = ?;";
             PreparedStatement statement = connection.prepareStatement(query);
             Scanner in = new Scanner(System.in);
-            int id;
-
 
             System.out.println("Delete row in table \"" + table + "\" by \"" + criterion + "\".");
 
-
-            id = in.nextInt();
+            int id = in.nextInt();
             statement.setInt(1, id);
 
-
             statement.executeUpdate();
-            in.close();
-            statement.close();
+            endingOperation(statement, in);
         } else {
             System.err.println("Incorrect table name.");
         }
+    }
+
+    private void endingOperation(Statement statement, Scanner in)
+    throws SQLException {
+        in.close();
+        statement.close();
     }
 
     public void execute(String method) throws
@@ -412,21 +355,14 @@ public class Database {
                     if (checkMethod.isAnnotationPresent(withConnection.class)) {
                         Scanner in = new Scanner(System.in);
 
-                        String arg1;
-
-                        String arg2;
-
-
                         System.out.println("Method: " + method + ".");
-
 
                         System.out.println("Enter updated column " +
                                 "(or table for \"deleteRow\"):"
                         );
-                        arg1 = in.next();
+                        String arg1 = in.next();
                         System.out.println("Enter criterion: ");
-                        arg2 = in.next();
-
+                        String arg2 = in.next();
 
                         try{
                             checkMethod.invoke(this, connection, arg1, arg2);
@@ -446,8 +382,6 @@ public class Database {
                     );
                     if (checkMethod.isAnnotationPresent(withConnection.class)) {
                         System.out.println("Method: " + method + ".");
-
-
                         try{
                             checkMethod.invoke(this, connection);
                         }
