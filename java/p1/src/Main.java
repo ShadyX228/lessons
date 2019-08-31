@@ -9,24 +9,32 @@
  *
  */
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
+import java.util.Properties;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Database testDatabase;
-        if(args.length == 0) {
-            testDatabase = new Database();
-        } else {
-            testDatabase = new Database(
-                    args[0],
-                    args[1],
-                    args[2],
-                    args[3],
-                    args[4]
-            );
-        }
+    public static void main(String[] args)
+            throws
+            SQLException,
+            NoSuchMethodException,
+            InvocationTargetException,
+            IllegalAccessException,
+            IOException  {
+        Properties properties = new Properties();
+        FileInputStream input = new FileInputStream("connection.properties");
+        properties.load(input);
+
+        Database testDatabase = new Database(
+                properties.getProperty("jdbc.driver"),
+                properties.getProperty("jdbc.url"),
+                properties.getProperty("jdbc.user"),
+                properties.getProperty("jdbc.password"),
+                properties.getProperty("jdbc.dbname")
+        );
 
         String method;
         Scanner in = new Scanner(System.in);
