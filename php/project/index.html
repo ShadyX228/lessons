@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="styles/style.css">
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/index.js"></script>
+		<meta charset="utf-8"> 
+	</head>
+	<body>
+		<div id="errorbar"></div>
+		<div id="userbar">
+			<button id="user_exit_button">Выйти</button>
+			<div id="login"></div>
+		</div>
+		<div id="autorize">
+			<form id="auth_form" method="POST">
+				<input type="text" name="auth_login" id="auth_login" placeholder="Логин">
+				<input type="password" name="auth_pass" id="auth_pass" placeholder="Пароль">
+				<input type="submit" id="auth_button" value="Тык">
+			</form>
+			<p><a id="show_form" href="#reg_form">Не зарегистрированы?</a></p>
+			<form id="reg_form" method="POST">
+				<input type="text" name="reg_login" id="reg_login" placeholder="Логин">
+				<input type="password" name="reg_pass" id="reg_pass" placeholder="Пароль">
+				<input type="password" name="reg_confirm_pass" id="reg_confirm_pass" placeholder="Подтвердите пароль">
+				<input type="submit" id="reg_button" value="Тык">
+			</form>
+		</div>
+		<div id="gamewait">
+			Ожидаем игру.
+			<span class="game_number"></span>
+			<span class="game_needed_players"></span>
+		</div>
+		<div id="field">
+			Игра началась.
+		</div>
+	</body>
+</html>

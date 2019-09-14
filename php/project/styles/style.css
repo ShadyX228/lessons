@@ -1,0 +1,36 @@
+header, nav, article, footer {
+	padding: 5px;
+	border: 1px solid black;
+}
+#wrap {
+	widthin: 500px;
+	margin: auto;
+}
+.cl {
+	clear: both;
+}
+nav {
+	float: left;
+}
+article {
+	float: left;
+	width: 300px;
+	word-break: break-all;
+}
+#autorize, #gamewait, #field, #userbar {
+	display: none;
+}
+#autorize {
+	background: red;
+}
+#gamewait {
+	background: green;
+}
+#field {
+	background: blue;
+}
+#reg_form {
+	display: none;
+}
+#show_form {
+}
