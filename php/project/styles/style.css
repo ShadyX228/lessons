@@ -27,10 +27,18 @@ article {
 	background: green;
 }
 #field {
-	background: blue;
+	background: white;
 }
 #reg_form {
 	display: none;
 }
 #show_form {
+}
+.gameField {
+	width: 50%;
+}
+.gameField td {
+	border: 1px solid black;
+	height: 50px;
+	text-align: center;
 }

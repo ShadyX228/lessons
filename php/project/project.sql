@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Сен 14 2019 г., 17:35
+-- Время создания: Окт 13 2019 г., 19:10
 -- Версия сервера: 10.1.37-MariaDB
 -- Версия PHP: 7.2.12
 
@@ -38,6 +38,23 @@ CREATE TABLE `cell` (
   `player_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Дамп данных таблицы `cell`
+--
+
+INSERT INTO `cell` (`cell_id`, `cell_game_id`, `cell_resource_id`, `cell_x`, `cell_y`, `cell_shield`, `player_id`) VALUES
+(114, 48, 5, 3, 0, 0, 3),
+(115, 48, 5, 0, 4, 0, 4),
+(116, 48, 5, 3, 8, 0, 5),
+(117, 48, 5, 8, 6, 0, 9),
+(118, 48, 5, 8, 2, 0, 11),
+(119, 47, 5, 3, 0, 0, 1),
+(120, 47, 5, 0, 4, 0, 2),
+(121, 47, 5, 3, 8, 0, 7),
+(122, 47, 5, 8, 6, 0, 8),
+(123, 47, 5, 8, 2, 0, 10),
+(124, 47, 5, 8, 4, 0, 8);
+
 -- --------------------------------------------------------
 
 --
@@ -50,17 +67,18 @@ CREATE TABLE `game` (
   `game_time_begin` datetime DEFAULT NULL,
   `game_last_step_time` datetime DEFAULT NULL,
   `game_step` int(11) DEFAULT NULL,
-  `game_players` int(11) DEFAULT NULL
+  `game_players` int(11) DEFAULT NULL,
+  `game_field_is_painted` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Дамп данных таблицы `game`
 --
 
-INSERT INTO `game` (`game_id`, `game_status`, `game_time_begin`, `game_last_step_time`, `game_step`, `game_players`) VALUES
-(47, 1, NULL, NULL, NULL, 5),
-(48, 1, NULL, NULL, NULL, 5),
-(49, 1, NULL, NULL, NULL, 5);
+INSERT INTO `game` (`game_id`, `game_status`, `game_time_begin`, `game_last_step_time`, `game_step`, `game_players`, `game_field_is_painted`) VALUES
+(47, 1, NULL, NULL, NULL, 5, 1),
+(48, 1, NULL, NULL, NULL, 5, 1),
+(49, 1, NULL, NULL, NULL, 5, 0);
 
 -- --------------------------------------------------------
 
@@ -117,6 +135,17 @@ CREATE TABLE `resources` (
   `resource_id` int(11) NOT NULL,
   `resource_name` varchar(32) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Дамп данных таблицы `resources`
+--
+
+INSERT INTO `resources` (`resource_id`, `resource_name`) VALUES
+(1, 'Mountain'),
+(2, 'Lain'),
+(3, 'Forest'),
+(4, 'Lake'),
+(5, 'NULL');
 
 -- --------------------------------------------------------
 
@@ -179,7 +208,7 @@ ALTER TABLE `unit`
 -- AUTO_INCREMENT для таблицы `cell`
 --
 ALTER TABLE `cell`
-  MODIFY `cell_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `cell_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=125;
 
 --
 -- AUTO_INCREMENT для таблицы `game`
@@ -197,7 +226,7 @@ ALTER TABLE `player`
 -- AUTO_INCREMENT для таблицы `resources`
 --
 ALTER TABLE `resources`
-  MODIFY `resource_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `resource_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT для таблицы `unit`
