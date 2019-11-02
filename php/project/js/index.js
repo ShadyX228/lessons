@@ -40,7 +40,7 @@ $(document).ready(function(){
 					$('#field').html(content);
 				
 
-					// подсвечиваем начальные позиции игрока
+					// подсвечиваем позиции игрока
 					// игроки друг друга не видят, поэтому изначально
 					// будет подсвечена одна позиция
 					var player_pos_x;
@@ -48,37 +48,43 @@ $(document).ready(function(){
 					$.post("php/startGame.php", function(data){
 						console.log("Field is painted.");
 						data = JSON.parse(data);
-						if(data.result.check_field != 1) {
-							player_pos_x = data.result.cell_x;
-							player_pos_y = data.result.cell_y;
+						
+						//if(data.result.check_field != 1) {
+						
+						var cells = data.result.cells;
+						
+						cells.forEach(function(item, position, cells) {
+							player_pos_x = item[1];
+							player_pos_y = item[2];
 							
-							for(var col = 0; col < fieldSize; col++) {
-								for(var line = 0;line < fieldSize; line++) {
-									if(col == player_pos_x && line == player_pos_y) {
-										$('td#cell' + col + line).html("*");
-										break;
-									}
+							$('td#cell' + player_pos_x + player_pos_y).html("*<br>");
+							$('td#cell' + player_pos_x + player_pos_y).css("background-color", data.result.cell_color);
+							
+							var units = data.result.units;
+							var cell_id = cells[position][0];
+							var cell_selector = $('td#cell' + player_pos_x + player_pos_y);
+							
+							units.forEach(function(item, position, arr) {
+								var unit_cell_id = units[position][1];																
+								var unit_id = units[position][0];
+								
+								if(unit_cell_id == cell_id) {
+								
+									cell_selector.append("<span class =\"unit\" id=" + player_pos_x + player_pos_y + unit_id + ">" + unit_id + "</span>");
+								} else {
+									cell_selector.html("No units.");
 								}
-							}
-						} else { // тут уже делаем выборку по всем клеткам игрока
-							$.post("php/selectPlayerCells.php", function(cells) {
-								cells = JSON.parse(cells);
-								var arr = cells.result;
-								
-								arr.forEach(function(cell, i, arr) {
-								  //alert(cell.cell_x + " " + cell.cell_y);
-								  $('td#cell' + cell.cell_x + cell.cell_y).html("*");
-								});
-								
-							})
-						}
+												
+								var unit_selector = $('span#' + player_pos_x + player_pos_y + unit_id +'.unit');
+								unit_selector.css("border", "1px solid black");
+								unit_selector.css("margin", "2px");
+								unit_selector.css("padding", "2px");													
+								unit_selector.css("background-color", data.result.cell_color);													
+																	
+							});
+							
+						})
 					})
-					
-					// делаем выборку по всем клеткам, 
-					// которые принадлежат игроку
-					
-					//var sessName = <?php echo json_encode($_SESSION["field_is_printed"]) ?>;
-					//alert(sessName);
 					
 				} else {
 					// Ожидание игры, pageStatus = 1
@@ -101,7 +107,8 @@ $(document).ready(function(){
 						})
 					}
 				}
-				setTimeout(ajax_page_status_update, 5000);
+				// управление обновлением страницы
+				//setTimeout(ajax_page_status_update, 5000);
 			} else {
 				// Пользователь не авторизован, pageStatus = 0
 				console.log("pageStatus = 0");

@@ -11,13 +11,6 @@
 	if($_SESSION["game_status"] == 1 && $check["game_field_is_painted"] == 0) {
 		// Игра началась. Рисуем клетки.
 		$fieldSize = 9;
-		/*$playersStartCell = array(
-			0 => "#ff0000",
-			1 => "#00ff00",
-			2 => "#0000ff",
-			3 => "#ffff00",
-			4 => "#ff00ff",
-		);*/
 		$playersStartCell = array(
 			array(intval($fieldSize-$fieldSize/2-1), 0),
 			array(0, intval($fieldSize-$fieldSize/2)),
@@ -25,31 +18,43 @@
 			array($fieldSize-1, $fieldSize-3),
 			array($fieldSize-1, 2)
 		);
+		// определяем цвет игрока
 		$user = dbQueryArrayFull("SELECT player_id FROM player WHERE player_game_id = $gid",$link);
 		$player_color = random_color();
-		$updateColor = dbQueryArray("UPDATE player SET player_color = $player_color WHERE player.player_id = $pid;",$link);
-		//echo $user[4][0];
-		//echo $playersStartCell[0][0];
+		
+		mysqli_query($link, "UPDATE player SET player_color = \"$player_color\" WHERE player.player_id = $pid;");
+		// распределяем игроков по карте
 		for($i = 0;$i<5;$i++) {
 			$pid_current = $user[$i][0];
 			$x = $playersStartCell[$i][0];
 			$y = $playersStartCell[$i][1];
-			$query = dbQueryArray("INSERT INTO cell (cell_game_id, cell_resource_id, cell_x, cell_y, cell_shield, player_id) VALUES ($gid, 5, $x, $y, 0, $pid_current)",$link);
-			//echo $playersStartCell[$i][$j];
+			mysqli_query($link,"INSERT INTO cell (cell_game_id, cell_resource_id, cell_x, cell_y, cell_shield, player_id) VALUES ($gid, 5, $x, $y, 0, $pid_current)");
 		}
-		$check = dbQueryArray("UPDATE game SET game_field_is_painted = 1 WHERE game_id = $gid",$link);
+		// распределение ресурсов по карте
+		
+		
+		// добавляем 3 юнита игроку (по правилам так), которые могут сделать 3 хода за кон
+		$cell_id_query = dbQueryArray("SELECT cell_id FROM cell WHERE cell.player_id = $pid",$link);
+		$cell_id = $cell_id_query["cell_id"];
+		for($i = 1; $i <= 3; $i++) {
+			mysqli_query($link,"INSERT INTO unit (unit_player_id, unit_cell_id, unit_steps) VALUES ($pid, $cell_id, 3)");
+		}
+		// поле отрисовано, игроки распределены. Это значение будет использовано при дальнейшем обращении к этой странице
+		mysqli_query($link,"UPDATE game SET game_field_is_painted = 1 WHERE game_id = $gid");
 	}
 	else {
 		array_push($errors, "-5");
 	}
-	$query = dbQueryArray("SELECT cell_x, cell_y, cell_shield, cell_resource_id FROM cell WHERE player_id = $pid",$link);
+	$cell_color = dbQueryArray("SELECT player_color FROM player WHERE player_id = $pid",$link);
+	$query = dbQueryArrayFull("SELECT cell_id, cell_x, cell_y, cell_shield, cell_resource_id FROM cell WHERE player_id = $pid",$link);
+	$units = dbQueryArrayFull("SELECT unit_id, unit_cell_id, unit_steps FROM unit WHERE unit_player_id = $pid",$link);
+	
 	//var_dump($query);
 	$res = array(
-		"cell_x" => $query["cell_x"],
-		"cell_y" => $query["cell_y"],
-		"cell_shield" => $query["cell_shield"],
-		"cell_resource_id" => $query["cell_resource_id"],
-		"check_field" => $check["game_field_is_painted"]
+		"cells" => $query,
+		"cell_color" => $cell_color["player_color"],
+		"units" => $units,
+		"check_field" => $check['game_field_is_painted']
 	);
 	$_SESSION["field_is_printed"] = 1;
 	//var_dump($res);
