@@ -26,6 +26,8 @@
 			array($fieldSize-1, 2)
 		);
 		$user = dbQueryArrayFull("SELECT player_id FROM player WHERE player_game_id = $gid",$link);
+		$player_color = random_color();
+		$updateColor = dbQueryArray("UPDATE player SET player_color = $player_color WHERE player.player_id = $pid;",$link);
 		//echo $user[4][0];
 		//echo $playersStartCell[0][0];
 		for($i = 0;$i<5;$i++) {

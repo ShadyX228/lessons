@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Окт 13 2019 г., 19:10
+-- Время создания: Ноя 02 2019 г., 14:38
 -- Версия сервера: 10.1.37-MariaDB
 -- Версия PHP: 7.2.12
 
@@ -52,8 +52,7 @@ INSERT INTO `cell` (`cell_id`, `cell_game_id`, `cell_resource_id`, `cell_x`, `ce
 (120, 47, 5, 0, 4, 0, 2),
 (121, 47, 5, 3, 8, 0, 7),
 (122, 47, 5, 8, 6, 0, 8),
-(123, 47, 5, 8, 2, 0, 10),
-(124, 47, 5, 8, 4, 0, 8);
+(123, 47, 5, 8, 2, 0, 10);
 
 -- --------------------------------------------------------
 
@@ -100,13 +99,13 @@ CREATE TABLE `player` (
 --
 
 INSERT INTO `player` (`player_id`, `player_name`, `player_game_id`, `player_color`, `player_steps`, `player_pass`) VALUES
-(1, 'odmen', 47, NULL, NULL, '148822'),
-(2, 'random_petr', 47, NULL, NULL, '1488222'),
+(1, 'odmen', 47, '#5907d9', NULL, '148822'),
+(2, 'random_petr', 47, '#09708c', NULL, '1488222'),
 (3, 'saeed', 48, NULL, NULL, '148822'),
 (4, 'jih228', 48, NULL, NULL, '148822'),
 (5, 'majid', 48, NULL, NULL, '148822'),
-(7, 'megataiger', 47, NULL, NULL, 'password'),
-(8, 'ejjw', 47, NULL, NULL, '148822'),
+(7, 'megataiger', 47, '#96502d', NULL, 'password'),
+(8, 'ejjw', 47, '#9b8c82', NULL, '148822'),
 (9, 'shket24', 48, NULL, NULL, '148822'),
 (10, 'sadik', 47, NULL, NULL, '148822'),
 (11, 'keken', 48, NULL, NULL, '148822'),
@@ -208,7 +207,7 @@ ALTER TABLE `unit`
 -- AUTO_INCREMENT для таблицы `cell`
 --
 ALTER TABLE `cell`
-  MODIFY `cell_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=125;
+  MODIFY `cell_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
 
 --
 -- AUTO_INCREMENT для таблицы `game`

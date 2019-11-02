@@ -1,14 +1,11 @@
 <?php
-		include 'model.php';
-		$login = $_GET['reg_login'];
-		$check = 0;
-		$logins = selectKeysFromQueryArray($link, "SELECT player_name FROM player", "player_name");
-		foreach($logins as $val) {
-			if($val == $login) {
-				$check = 1;
-				break;
-			}
-		}
-		//var_dump(selectKeysFromQueryArray($link, "SELECT player_name FROM player", "player_name"));
-		echo $check;
+function random_color_part() {
+    return str_pad( dechex( mt_rand( 0, 255 ) ), 2, '0', STR_PAD_LEFT);
+}
+
+function random_color() {
+    return '#'.random_color_part() . random_color_part() . random_color_part();
+}
+
+echo random_color();
 ?>

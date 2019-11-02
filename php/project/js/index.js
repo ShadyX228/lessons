@@ -1,3 +1,4 @@
+// допилить вывод цвета в клетках
 $(document).ready(function(){
 	ajax_page_status_update();
 	function ajax_page_status_update() {	
