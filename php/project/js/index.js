@@ -108,7 +108,7 @@ $(document).ready(function(){
 					}
 				}
 				// управление обновлением страницы
-				//setTimeout(ajax_page_status_update, 5000);
+				setTimeout(ajax_page_status_update, 5000);
 			} else {
 				// Пользователь не авторизован, pageStatus = 0
 				console.log("pageStatus = 0");
