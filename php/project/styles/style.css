@@ -37,8 +37,16 @@ article {
 .gameField {
 	width: 50%;
 }
-.gameField td {
+.cell {
 	border: 1px solid black;
 	height: 50px;
 	text-align: center;
+	-webkit-transition: background 1000ms ease;
+	-moz-transition: background 1000ms ease;
+	-ms-transition: background 1000ms ease;
+	-o-transition: background 1000ms ease;
+	transition: background 1000ms ease;
+}
+#userlog div {
+	display: inline;
 }

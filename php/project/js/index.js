@@ -30,7 +30,7 @@ $(document).ready(function(){
 						content += "\t<tr>\n";
 						for(var line = 0;line < fieldSize; line++) {
 							//content += "\t\t<td>(";
-							content += "\t\t<td id=\"cell" + col + line + "\">(";
+							content += "\t\t<td class=\"cell\" id=\"cell" + col + line + "\">(";
 							content += col + " " + line;	
 							content += ")</td>";
 						}
@@ -38,6 +38,8 @@ $(document).ready(function(){
 					}
 					content += "</table>";
 					$('#field').html(content);
+					var userlog = "<div id=\"userlog\"> Ход: <div id=\"game_step\"></div>. Доступные ходы юнитов: <div id=\"player_steps\"></div>. Юниты: <div id=\"player_units\"></div>. Число ходов выбранного юнита:  <div id=\"unit_steps\"></div></div>";
+					$('#field').append(userlog);
 				
 
 					// подсвечиваем позиции игрока
@@ -49,7 +51,9 @@ $(document).ready(function(){
 						console.log("Field is painted.");
 						data = JSON.parse(data);
 						
-						//if(data.result.check_field != 1) {
+						$('#player_units').html(data.result.unit_count);
+						$('#player_steps').html(data.result.unit_count*5);
+						$('#game_step').html(data.result.game_step);
 						
 						var cells = data.result.cells;
 						
@@ -84,6 +88,89 @@ $(document).ready(function(){
 							});
 							
 						})
+					
+						// механизм ходов
+						
+						
+						$('.unit').bind('click', function() {								
+							var unit = $(this);
+							
+							var unit_selector = unit.attr('id').split("");
+							
+							var unit_id = unit_selector[2];
+							for(var i = 3; i < unit_selector.length; i++) {
+								//alert(unit_selector[i]);
+								unit_id += unit_selector[i];
+							}
+							var unit_x = unit_selector[0];
+							var unit_y = unit_selector[1];
+							//alert(unit_selector);
+							 
+							var cell_current = $('td#cell' + unit_x + unit_y + '.cell');
+							var cell_current_id = $('td#cell' + unit_x + unit_y + '.cell').attr('id');
+							
+							unit.css("border-color","red");
+							
+							console.log("unit " + unit_id);
+							
+							
+							$('.cell').click(function() {								
+								var cell_new = $(this);
+								var cell_new_id = $(this).attr('id');
+								var cell_new_x = cell_new_id.split("")[4];
+								var cell_new_y = cell_new_id.split("")[5];								
+							
+								
+								var path = Math.sqrt((cell_new_x - unit_x)*(cell_new_x - unit_x)+(cell_new_y - unit_y)*(cell_new_y - unit_y));
+								path = Math.round(path);	
+																															
+					
+								if(path != 0) {
+									if($("#unit_steps").text() == 0? path <= 5 : path <= $("#unit_steps").text()) {												
+								
+										console.log("|path| = " + path);
+										var comp = $("#unit_steps").text() == 0? 5 : $("#unit_steps").text();
+										$("#unit_steps").html(comp-path);
+										
+										var remain = $("#unit_steps").text();	
+										console.log("remain of steps = " + remain);
+										
+										if(remain == 0) {
+											unit.off();
+										}							
+										if(cell_new_id != cell_current_id) {
+											var totalSteps = $('#player_steps').text();	
+											allSteps = totalSteps-path;	
+											$('#player_steps').html(allSteps);	
+										
+											$('#unit_steps').html(remain);
+										
+											console.log("|path| = " + path + ", moved to (" + cell_new_x + " " + cell_new_y + "), all steps: " + allSteps);
+										
+											cell_new.css("background", data.result.cell_color)
+											cell_new.append(unit);
+										
+											unit.attr('id',cell_new_x + '' + cell_new_y + '' + unit_id);								
+											$('.cell').unbind();
+											unit.css("border-color","black");
+											// тут ajax-запрос на обновление инфы в базе
+										}								
+									} else {
+										cell_new.css("background", "red");
+										console.log("|path| = " + path);
+										setTimeout(function() {cell_new.css("background", "white")}, 5000);	
+									
+									}
+								}
+								if($('#player_steps').text() == 0) {
+									ajax_page_status_update();
+								}
+																							
+							})							
+					
+						})
+						
+						
 					})
 					
 				} else {
@@ -108,7 +195,7 @@ $(document).ready(function(){
 					}
 				}
 				// управление обновлением страницы
-				setTimeout(ajax_page_status_update, 5000);
+				//setTimeout(ajax_page_status_update, 5000);
 			} else {
 				// Пользователь не авторизован, pageStatus = 0
 				console.log("pageStatus = 0");
@@ -157,9 +244,9 @@ $(document).ready(function(){
 		})			
     }); 
 
-	/* 
+	/* done
 	Функция: unit.click()
-	внутри есть cell.click(), которая переместит юнитта из одной клетки в другую
+	внутри есть cell.click(), которая переместит юнита из одной клетки в другую
 	в cell.click() нужно сделать проверку, чтобы юнит дальше одной клетки не мог быть перемещен
 	в cell.click() как раз и будет эта проверка
 	если проверка пройдена, то далаем ajax-запрос в файл changeUnitPosition.php
@@ -170,6 +257,11 @@ $(document).ready(function(){
 	если нет, то клетка просто переходит во владение игрока
 	в конце всего нужно исходя из бонус, которые дают ресурсы клетки, обновить инфу в базе об игроке
 	*/
+	/*
+		Баг: если у выбранного юнита остаются ходы и при этом выбирается другой, остоток ходов старого юнита переходит новому
+	*/
+	
+	
 	function ajax_auth(){ 
 		var login = $("#auth_login").val(); 
 		var pass = $("#auth_pass").val(); 

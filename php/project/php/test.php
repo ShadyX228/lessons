@@ -2,9 +2,9 @@
 include 'model.php';
 session_start(); 	
 
-$pid = $_SESSION["pid"];
-$user_check = dbQueryArray("SELECT player_ready FROM player WHERE player_id = $pid",$link);
-echo $user_check["player_ready"];
+$gid = $_SESSION["game_id"];
+$game_step = dbQueryArray("SELECT game_step FROM game WHERE game_id = $gid",$link);
+echo $game_step["game_step"];
 
 
 ?>
