@@ -71,10 +71,10 @@ $(document).ready(function(){
 							units.forEach(function(item, position, arr) {
 								var unit_cell_id = units[position][1];																
 								var unit_id = units[position][0];
-								var unit_steps = units[position][2];
-								console.log(unit_id + " " + unit_cell_id);
+								var unit_steps = units[position][2];						
 								
-								if(unit_cell_id == cell_id) {						
+								if(unit_cell_id == cell_id) {		
+									console.log(unit_id + " " + unit_cell_id);								
 									cell_selector.append("<span class =\"unit\" id=" + player_pos_x + player_pos_y + unit_id + ">" + unit_id + "</span>");
 								}
 												
@@ -89,104 +89,10 @@ $(document).ready(function(){
 						})
 					
 						// механизм ходов
+						doStep(data);
+					
 						
 						
-						$('.unit').bind('click', function() {								
-							var unit = $(this);
-							
-							var unit_selector = unit.attr('id').split("");
-							
-							var unit_id = unit_selector[2];
-							for(var i = 3; i < unit_selector.length; i++) {
-								//alert(unit_selector[i]);
-								unit_id += unit_selector[i];
-							}
-							var unit_x = unit_selector[0];
-							var unit_y = unit_selector[1];
-							//alert(unit_selector);
-							 
-							var cell_current = $('td#cell' + unit_x + unit_y + '.cell');
-							var cell_current_id = $('td#cell' + unit_x + unit_y + '.cell').attr('id');
-							
-							unit.css("border-color","red");
-							var units = data.result.units;		
-							var unit_steps;
-
-							units.forEach(function(item, position, arr) {
-								if(units[position][0] == unit_id) {
-									unit_steps = units[position][2];
-								}
-							})
-							//alert(unit_steps);
-							
-							console.log("unit " + unit_id + " can do " + unit_steps + " steps");
-							$("#unit_steps").html(unit_steps);
-							
-							
-							$('.cell').click(function() {								
-								var cell_new = $(this);
-								var cell_new_id = $(this).attr('id');
-								var cell_new_x = cell_new_id.split("")[4];
-								var cell_new_y = cell_new_id.split("")[5];								
-							
-								
-								var path = Math.sqrt((cell_new_x - unit_x)*(cell_new_x - unit_x)+(cell_new_y - unit_y)*(cell_new_y - unit_y));
-								path = Math.round(path);	
-								
-								//console.log(data.result.units[0][2]);
-																															
-					
-								if(path != 0) {
-									if(path <= $("#unit_steps").text()) {												
-								
-										console.log("|path| = " + path);
-										var comp = $("#unit_steps").text();
-										$("#unit_steps").html(comp-path);
-										
-										var remain = $("#unit_steps").text();	
-										console.log("remain of steps = " + remain);
-										
-										if(remain == 0) {
-											unit.off();
-										}							
-										if(cell_new_id != cell_current_id) {
-											var totalSteps = $('#player_steps').text();	
-											allSteps = totalSteps-path;	
-											$('#player_steps').html(allSteps);	
-										
-											$('#unit_steps').html(remain);
-										
-											console.log("|path| = " + path + ", moved to (" + cell_new_x + " " + cell_new_y + "), all steps: " + allSteps);
-										
-											cell_new.css("background", data.result.cell_color)
-											cell_new.append(unit);
-										
-											unit.attr('id',cell_new_x + '' + cell_new_y + '' + unit_id);								
-											$('.cell').unbind();
-											unit.css("border-color","black");
-											
-											// тут ajax-запрос на обновление инфы в базе (драки тоже тут будут)
-											alert(unit_id + " " + unit_steps + " " + cell_new_x + " " + cell_new_y);
-											$.post("php/actions/doStep.php", {'unit_id' : unit_id, 'unit_steps' : remain, 'unit_pos_x' : cell_new_x, 'unit_pos_y' : cell_new_y}, function(){
-												ajax_page_status_update();
-											})	
-											// ajax_page_status_update();
-										}								
-									} else {
-										cell_new.css("background", "red");
-										console.log("|path| = " + path);
-										setTimeout(function() {cell_new.css("background", "white")}, 5000);	
-									
-									}
-								}
-								if($('#player_steps').text() == 0) {
-									// тут будет запрос на обновление статуса игрока (закончил ход) и увеличение кона на 1
-									ajax_page_status_update();
-								}
-																							
-							})							
-					
-						})
 						
 						
 					})
@@ -262,6 +168,112 @@ $(document).ready(function(){
 		})			
     }); 
 
+
+	function doStep(data) {
+		var units = data.result.units;
+		var cells = data.result.cells;
+		$('.unit').bind('click', function() {
+			$('.unit').off();
+			var unit = $(this);
+		
+							
+			var unit_selector = unit.attr('id').split("");
+							
+			var unit_id = unit_selector[2];
+			for(var i = 3; i < unit_selector.length; i++) {
+				//alert(unit_selector[i]);
+				unit_id += unit_selector[i];
+			}
+			var unit_x = unit_selector[0];
+			var unit_y = unit_selector[1];
+			//alert(unit_selector);
+							 
+			var cell_current = $('td#cell' + unit_x + unit_y + '.cell');
+			var cell_current_id = $('td#cell' + unit_x + unit_y + '.cell').attr('id');
+							
+			unit.css("border-color","red");
+			var unit_steps;
+			var unit_current_cell_id;
+			units.forEach(function(item, position, arr) {
+				if(units[position][0] == unit_id) {
+					unit_steps = units[position][2];
+					unit_current_cell_id = units[position][1];
+				}
+			})
+			//alert(unit_steps);
+							
+			console.log("unit#" + unit_id + ", cell#" + unit_current_cell_id + " can do " + unit_steps + " steps");
+			$("#unit_steps").html(unit_steps);
+							
+							
+			$('.cell').on("click", function() {								
+				var cell_new = $(this);
+				var cell_new_id = $(this).attr('id');
+				var cell_new_x = cell_new_id.split("")[4];
+				var cell_new_y = cell_new_id.split("")[5];
+				if(cell_new_id == cell_current_id) {
+					alert(1);
+				}					
+							
+								
+				var path = Math.sqrt((cell_new_x - unit_x)*(cell_new_x - unit_x)+(cell_new_y - unit_y)*(cell_new_y - unit_y));
+				path = Math.round(path);	
+								
+				//console.log(data.result.units[0][2]);
+																															
+					
+				if(path != 0) {
+					if(path <= $("#unit_steps").text()) {																		
+							console.log("|path| = " + path);
+							var comp = $("#unit_steps").text();
+							$("#unit_steps").html(comp-path);
+										
+							var remain = $("#unit_steps").text();	
+							console.log("remain of steps = " + remain);
+										
+							if(remain == 0) {
+								unit.off();
+							}							
+							if(cell_new_id != cell_current_id) {
+								var totalSteps = $('#player_steps').text();	
+								allSteps = totalSteps-path;	
+								$('#player_steps').html(allSteps);	
+										
+								$('#unit_steps').html(remain);
+										
+								console.log("|path| = " + path + ", moved to (" + cell_new_x + " " + cell_new_y + "), all steps: " + allSteps);
+										
+								cell_new.css("background", data.result.cell_color)
+								cell_new.append(unit);
+										
+								unit.attr('id',cell_new_x + '' + cell_new_y + '' + unit_id);								
+								$('.cell').unbind();
+								unit.css("border-color","black");
+											
+								// тут ajax-запрос на обновление инфы в базе (драки тоже тут будут)
+								alert(unit_id + " " + unit_steps + " " + cell_new_x + " " + cell_new_y);
+								$.post("php/actions/doStep.php", {'unit_id' : unit_id, 'unit_steps' : remain, 'unit_pos_x' : cell_new_x, 'unit_pos_y' : cell_new_y, 'allSteps' : allSteps}, function(){
+									ajax_page_status_update();
+								})	
+											// ajax_page_status_update();
+								}								
+					} else {
+						cell_new.css("background", "red");
+						console.log("|path| = " + path);
+						setTimeout(function() {cell_new.css("background", "white")}, 5000);	
+									
+						}
+					}
+					if($('#player_steps').text() == 0) {
+						// тут будет запрос на обновление статуса игрока (закончил ход) и увеличение кона на 1
+						ajax_page_status_update();
+					}
+																							
+			})							
+					
+		})
+	
+	}
 	/* done
 	Функция: unit.click()
 	внутри есть cell.click(), которая переместит юнита из одной клетки в другую
