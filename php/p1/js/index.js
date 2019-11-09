@@ -71,12 +71,11 @@ $(document).ready(function(){
 							units.forEach(function(item, position, arr) {
 								var unit_cell_id = units[position][1];																
 								var unit_id = units[position][0];
+								var unit_steps = units[position][2];
+								console.log(unit_id + " " + unit_cell_id);
 								
-								if(unit_cell_id == cell_id) {
-								
+								if(unit_cell_id == cell_id) {						
 									cell_selector.append("<span class =\"unit\" id=" + player_pos_x + player_pos_y + unit_id + ">" + unit_id + "</span>");
-								} else {
-									cell_selector.html("No units.");
 								}
 												
 								var unit_selector = $('span#' + player_pos_x + player_pos_y + unit_id +'.unit');
@@ -110,8 +109,18 @@ $(document).ready(function(){
 							var cell_current_id = $('td#cell' + unit_x + unit_y + '.cell').attr('id');
 							
 							unit.css("border-color","red");
+							var units = data.result.units;		
+							var unit_steps;
+
+							units.forEach(function(item, position, arr) {
+								if(units[position][0] == unit_id) {
+									unit_steps = units[position][2];
+								}
+							})
+							//alert(unit_steps);
 							
-							console.log("unit " + unit_id);
+							console.log("unit " + unit_id + " can do " + unit_steps + " steps");
+							$("#unit_steps").html(unit_steps);
 							
 							
 							$('.cell').click(function() {								
@@ -123,13 +132,15 @@ $(document).ready(function(){
 								
 								var path = Math.sqrt((cell_new_x - unit_x)*(cell_new_x - unit_x)+(cell_new_y - unit_y)*(cell_new_y - unit_y));
 								path = Math.round(path);	
+								
+								//console.log(data.result.units[0][2]);
 																															
 					
 								if(path != 0) {
-									if($("#unit_steps").text() == 0? path <= 5 : path <= $("#unit_steps").text()) {												
+									if(path <= $("#unit_steps").text()) {												
 								
 										console.log("|path| = " + path);
-										var comp = $("#unit_steps").text() == 0? 5 : $("#unit_steps").text();
+										var comp = $("#unit_steps").text();
 										$("#unit_steps").html(comp-path);
 										
 										var remain = $("#unit_steps").text();	
@@ -153,7 +164,13 @@ $(document).ready(function(){
 											unit.attr('id',cell_new_x + '' + cell_new_y + '' + unit_id);								
 											$('.cell').unbind();
 											unit.css("border-color","black");
-											// тут ajax-запрос на обновление инфы в базе
+											
+											// тут ajax-запрос на обновление инфы в базе (драки тоже тут будут)
+											alert(unit_id + " " + unit_steps + " " + cell_new_x + " " + cell_new_y);
+											$.post("php/actions/doStep.php", {'unit_id' : unit_id, 'unit_steps' : remain, 'unit_pos_x' : cell_new_x, 'unit_pos_y' : cell_new_y}, function(){
+												ajax_page_status_update();
+											})	
+											// ajax_page_status_update();
 										}								
 									} else {
 										cell_new.css("background", "red");
@@ -163,6 +180,7 @@ $(document).ready(function(){
 									}
 								}
 								if($('#player_steps').text() == 0) {
+									// тут будет запрос на обновление статуса игрока (закончил ход) и увеличение кона на 1
 									ajax_page_status_update();
 								}
 																							

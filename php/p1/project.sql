@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.3
+-- version 4.9.1
 -- https://www.phpmyadmin.net/
 --
--- Хост: 127.0.0.1
--- Время создания: Ноя 02 2019 г., 14:38
--- Версия сервера: 10.1.37-MariaDB
--- Версия PHP: 7.2.12
+-- Хост: localhost
+-- Время создания: Ноя 09 2019 г., 06:19
+-- Версия сервера: 10.4.8-MariaDB
+-- Версия PHP: 7.3.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -43,16 +43,12 @@ CREATE TABLE `cell` (
 --
 
 INSERT INTO `cell` (`cell_id`, `cell_game_id`, `cell_resource_id`, `cell_x`, `cell_y`, `cell_shield`, `player_id`) VALUES
-(114, 48, 5, 3, 0, 0, 3),
-(115, 48, 5, 0, 4, 0, 4),
-(116, 48, 5, 3, 8, 0, 5),
-(117, 48, 5, 8, 6, 0, 9),
-(118, 48, 5, 8, 2, 0, 11),
-(119, 47, 5, 3, 0, 0, 1),
-(120, 47, 5, 0, 4, 0, 2),
-(121, 47, 5, 3, 8, 0, 7),
-(122, 47, 5, 8, 6, 0, 8),
-(123, 47, 5, 8, 2, 0, 10);
+(448, 50, 5, 3, 0, 0, 46),
+(449, 50, 5, 0, 4, 0, 47),
+(450, 50, 5, 3, 8, 0, 48),
+(451, 50, 5, 8, 6, 0, 49),
+(452, 50, 5, 8, 2, 0, 50),
+(464, 50, 5, 7, 2, 0, 50);
 
 -- --------------------------------------------------------
 
@@ -75,9 +71,7 @@ CREATE TABLE `game` (
 --
 
 INSERT INTO `game` (`game_id`, `game_status`, `game_time_begin`, `game_last_step_time`, `game_step`, `game_players`, `game_field_is_painted`) VALUES
-(47, 1, NULL, NULL, NULL, 5, 1),
-(48, 1, NULL, NULL, NULL, 5, 1),
-(49, 1, NULL, NULL, NULL, 5, 0);
+(50, 1, NULL, NULL, 1, 5, 1);
 
 -- --------------------------------------------------------
 
@@ -91,38 +85,20 @@ CREATE TABLE `player` (
   `player_game_id` int(11) DEFAULT NULL,
   `player_color` varchar(7) DEFAULT NULL,
   `player_steps` int(3) DEFAULT NULL,
-  `player_pass` varchar(16) NOT NULL
+  `player_pass` varchar(16) NOT NULL,
+  `player_ready` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Дамп данных таблицы `player`
 --
 
-INSERT INTO `player` (`player_id`, `player_name`, `player_game_id`, `player_color`, `player_steps`, `player_pass`) VALUES
-(1, 'odmen', 47, '#5907d9', NULL, '148822'),
-(2, 'random_petr', 47, '#09708c', NULL, '1488222'),
-(3, 'saeed', 48, NULL, NULL, '148822'),
-(4, 'jih228', 48, NULL, NULL, '148822'),
-(5, 'majid', 48, NULL, NULL, '148822'),
-(7, 'megataiger', 47, '#96502d', NULL, 'password'),
-(8, 'ejjw', 47, '#9b8c82', NULL, '148822'),
-(9, 'shket24', 48, NULL, NULL, '148822'),
-(10, 'sadik', 47, NULL, NULL, '148822'),
-(11, 'keken', 48, NULL, NULL, '148822'),
-(12, 'habib', 49, NULL, NULL, '148822'),
-(13, 'farhad', 49, NULL, NULL, '148822'),
-(14, 'majima', 49, NULL, NULL, '148822'),
-(35, 'majim', 49, NULL, NULL, '148822'),
-(36, 'majimas', NULL, NULL, NULL, '148822'),
-(37, 'majimass', NULL, NULL, NULL, '148822'),
-(38, 'majima92', NULL, NULL, NULL, '148822'),
-(39, 'majima926', NULL, NULL, NULL, '148822'),
-(40, 'majima2222', NULL, NULL, NULL, '148822'),
-(41, 'm762', NULL, NULL, NULL, '148822'),
-(42, 'majimaas2', NULL, NULL, NULL, '148822'),
-(43, 'majima4ffd', NULL, NULL, NULL, '148822'),
-(44, 'majima21af2', NULL, NULL, NULL, '148822'),
-(45, 'majima2', 49, NULL, NULL, '148822');
+INSERT INTO `player` (`player_id`, `player_name`, `player_game_id`, `player_color`, `player_steps`, `player_pass`, `player_ready`) VALUES
+(46, 'habib', 50, '#1ea23f', NULL, '148822', 1),
+(47, 'tuger', 50, '#6671b6', NULL, '148822', 1),
+(48, 'connor', 50, '#7c01ee', NULL, '148822', 1),
+(49, 'mcgregor', 50, '#caae7e', NULL, '148822', 1),
+(50, 'epta', 50, '#824516', NULL, '148822', 1);
 
 -- --------------------------------------------------------
 
@@ -158,6 +134,27 @@ CREATE TABLE `unit` (
   `unit_cell_id` int(11) NOT NULL,
   `unit_steps` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Дамп данных таблицы `unit`
+--
+
+INSERT INTO `unit` (`unit_id`, `unit_player_id`, `unit_cell_id`, `unit_steps`) VALUES
+(202, 46, 448, 5),
+(203, 46, 448, 5),
+(204, 46, 448, 5),
+(205, 47, 449, 5),
+(206, 47, 449, 5),
+(207, 47, 449, 5),
+(208, 48, 450, 5),
+(209, 48, 450, 5),
+(210, 48, 450, 5),
+(211, 49, 451, 5),
+(212, 49, 451, 5),
+(213, 49, 451, 5),
+(214, 50, 452, 5),
+(215, 50, 452, 5),
+(216, 50, 464, 4);
 
 --
 -- Индексы сохранённых таблиц
@@ -207,19 +204,19 @@ ALTER TABLE `unit`
 -- AUTO_INCREMENT для таблицы `cell`
 --
 ALTER TABLE `cell`
-  MODIFY `cell_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
+  MODIFY `cell_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=465;
 
 --
 -- AUTO_INCREMENT для таблицы `game`
 --
 ALTER TABLE `game`
-  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT для таблицы `player`
 --
 ALTER TABLE `player`
-  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT для таблицы `resources`
@@ -231,7 +228,7 @@ ALTER TABLE `resources`
 -- AUTO_INCREMENT для таблицы `unit`
 --
 ALTER TABLE `unit`
-  MODIFY `unit_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `unit_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=217;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

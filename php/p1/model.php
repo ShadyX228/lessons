@@ -1,53 +1,36 @@
 <?php
 	function dbConnect() {
 		$dblocation = "localhost";
-		$dbname = "task_db";
+		$dbname = "project";
 		$dbuser = "root";
 		$dbpasswd = "12345";
-		$link = mysqli_connect($dblocation, $dbuser, $dbpasswd, $dbname);
+		$link = mysqli_connect($dblocation, $dbuser, $dbpasswd, $dbname) or die('Error!');
 		return $link;
-	}		
-	function getMenu() {
-		$link = dbConnect();
-		$sql_1 = "SELECT page_id, page_name, page_weight FROM pages ORDER BY page_weight DESC";
-		$result_1 = mysqli_query($link, $sql_1);
-		$menuArray = array();
-		while($row = mysqli_fetch_assoc($result_1)){
-			$menuArray[] = array(
-				"pid" => $row["page_id"],
-				"pname" => $row["page_name"],
-				"pweight" => $row["page_weight"]
-			);
-		}
-		return $menuArray;
-	}	
-	function buildMenu($menuArray) {
-		if(empty($menuArray))
-			echo "Данных нет";
-		else {
-			$menu = "\t<ul>\n";
-			foreach($menuArray as $elem) {
-				if(isset($_GET["page_id"]) && $_GET["page_id"] == $elem["pid"]) 
-					$menu .= "\t\t\t\t\t<li>". $elem["pname"] . " " . $elem["pweight"]."</li>\n";
-				else $menu .= "\t\t\t\t\t<li><a href='?page_id=" . $elem["pid"]. "'>". $elem["pname"] . "</a> (". $elem["pweight"].")</li>\n";
-			}
-			$menu .= "\t\t\t\t</ul>\n";
-		}
-		return $menu;
-	}	
-	function getPageContent($pid) {
-		$req_page_id = $_GET["page_id"];
-		$link = dbConnect();
-		$sql_2 = "SELECT * FROM pages WHERE page_id = $req_page_id";
-		$wrap = mysqli_query($link, $sql_2);
-		$row = mysqli_fetch_assoc($wrap);
-		return $row["page_text"];
 	}
-	function getPageWeightZero() {
-		$link = dbConnect();
-		$sql_3 = "SELECT * FROM pages WHERE page_weight = 0 LIMIT 0,1";
-		$wrap = mysqli_query($link, $sql_3);
-		$row = mysqli_fetch_assoc($wrap);
-		return $row["page_text"];
+	function sessExit() {
+		session_unset();
+		
+	}
+	function printForm() {
+		return '	<form id="auth_form" method="POST">
+				<input type="text" name="auth_login" id="login" placeholder="Логин">
+				<input type="password" name="auth_pass" id="pass" placeholder="Пароль">
+				<input type="submit" id="submit_button" value="тык">
+			</form>	';
+	}
+	function userbar($session_user_login) {
+		if (isset($session_user_login)) {
+			return "Йоу, " . $session_user_login . ". <a href='exit.php'>Выйти</a>";
+		}
+		else {
+			return printForm();
+		}	
+	}
+	function random_color_part() {
+		return str_pad( dechex( mt_rand( 0, 255 ) ), 2, '0', STR_PAD_LEFT);
+	}
+
+	function random_color() {
+		return random_color_part() . random_color_part() . random_color_part();
 	}
 ?>
