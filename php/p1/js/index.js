@@ -124,6 +124,10 @@ $(document).ready(function(){
 								}
 							})
 							//alert(unit_steps);
+							if(unit_steps == 0) {
+								alert("Нет доступных ходов. Выберите другого юнита.");
+								ajax_page_status_update();
+							}
 							
 							console.log("unit " + unit_id + " can do " + unit_steps + " steps");
 							$("#unit_steps").html(unit_steps);

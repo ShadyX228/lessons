@@ -34,11 +34,14 @@
 		$cellPid = $checkCell['player_id'];
 		if($cellPid == $pid) {
 			mysqli_query($link, "UPDATE unit SET unit_cell_id = $cellId, unit_steps = $unit_steps WHERE unit_id = $unit_id");
-		} else {
+		} else if($cellPid == null) {
+			// клетка с ресурсами, не занятая
+			// проверить, что на клетке за ресурс и дать игроку бонусы
+		}
+		else {
 			// чужая клетка
-			// берем клетку в осаду, юзверю выводим сообщение.
+			// определяем победителя
 			$units_player = $unit_count;
-			$falls_player;
 			
 			$query = mysqli_query($link, "SELECT cell_id FROM cell WHERE player_id = $pid");			
 			$territory_player = mysqli_num_rows($query);
@@ -50,8 +53,23 @@
 			$falls_player = $query['player_falls'];
 			
 			$win_player = (1+$wins_player)*$units_player*$territory_player/((1+$falls_player)*1000);
-			
+		
 			// сделать то же самое для вражеского юнита
+			$query = mysqli_query($link, "SELECT unit_id FROM unit WHERE unit_player_id = $cellPid");	
+			$units_enemy = mysqli_num_rows($query);
+			
+			$query = mysqli_query($link, "SELECT cell_id FROM cell WHERE player_id = $cellPid");			
+			$territory_enemy = mysqli_num_rows($query);
+			
+			$query = dbQueryArray("SELECT player_wins FROM player WHERE player_id = $cellPid",$link);
+			$wins_enemy = $query['player_wins'];
+			
+			$query = dbQueryArray("SELECT player_falls FROM player WHERE player_id = $cellPid",$link);
+			$falls_enemy = $query['player_falls'];
+			
+			$win_enemy = (1+$wins_enemy)*$units_enemy*$territory_enemy/((1+$falls_enemy)*1000);
+			
+			echo $win_player . " " . $win_enemy;
 			
 			// сделать сравнение
 			
