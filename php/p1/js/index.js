@@ -1,230 +1,240 @@
 // допилить вывод цвета в клетках
 $(document).ready(function(){
-	ajax_page_status_update();
-	function ajax_page_status_update() {	
-		$.post("php/getUserData.php", function(data){		
-			$("#errorbar").html("");
-			if(data.length > 0) {
-				var res = JSON.parse(data);
-				$('#login').html(res.p_name);				
-				if(res.p_gid != null && res.g_players_num == 5) {
-					// Игра началась, pageStatus = 2
-					console.log("pageStatus = 2");
-					$('#autorize').hide();
-					$('#gamewait').hide();	
-					$('#field').show();
-					$('#userbar').show();
+	$.post("php/getUserData.php", ajax_page_status_update);
+	function ajax_page_status_update(data){		
+		$("#errorbar").html("");
+		if(data.length > 0) {
+			var res = JSON.parse(data);
+			$('#login').html(res.p_name);				
+			if(res.p_gid != null && res.g_players_num == 5) {
+				// Игра началась, pageStatus = 2
+				console.log("pageStatus = 2");
+				$('#autorize').hide();
+				$('#gamewait').hide();	
+				$('#field').show();
+				$('#userbar').show();
 					
-					// рисуем поле, делаем расстановку игроков на позиции	
-					var fieldSize = 9;
-					var playersStartCell = [
-						[parseInt(fieldSize-fieldSize/2-1), 0],
-						[0, parseInt(fieldSize-fieldSize/2)],
-						[parseInt(fieldSize-fieldSize/2-1), fieldSize-1],
-						[fieldSize-1, fieldSize-3],
-						[fieldSize-1, 2]
-					];
+				// рисуем поле, делаем расстановку игроков на позиции	
+				var fieldSize = 9;
+				var playersStartCell = [
+					[parseInt(fieldSize-fieldSize/2-1), 0],
+					[0, parseInt(fieldSize-fieldSize/2)],
+					[parseInt(fieldSize-fieldSize/2-1), fieldSize-1],
+					[fieldSize-1, fieldSize-3],
+					[fieldSize-1, 2]
+				];
 					
-					var content = "<table class=\"gameField\">";
-					for(var col = 0; col < fieldSize; col++) {
-						content += "\t<tr>\n";
-						for(var line = 0;line < fieldSize; line++) {
-							//content += "\t\t<td>(";
-							content += "\t\t<td class=\"cell\" id=\"cell" + col + line + "\">(";
-							content += col + " " + line;	
-							content += ")</td>";
-						}
-						content += "</tr>\n";
+				var content = "<table class=\"gameField\">";
+				for(var col = 0; col < fieldSize; col++) {
+					content += "\t<tr>\n";
+					for(var line = 0;line < fieldSize; line++) {
+						//content += "\t\t<td>(";
+						content += "\t\t<td class=\"cell\" id=\"cell" + col + line + "\">(";
+						content += col + " " + line;	
+						content += ")</td>";
 					}
-					content += "</table>";
-					$('#field').html(content);
-					var userlog = "<div id=\"userlog\"> Ход: <div id=\"game_step\"></div>. Доступные ходы юнитов: <div id=\"player_steps\"></div>. Юниты: <div id=\"player_units\"></div>. Число ходов выбранного юнита:  <div id=\"unit_steps\"></div></div>";
-					$('#field').append(userlog);
+					content += "</tr>\n";
+				}
+				content += "</table>";
+				$('#field').html(content);
+				var userlog = "<div id=\"userlog\"> Ход: <div id=\"game_step\"></div>. Доступные ходы юнитов: <div id=\"player_steps\"></div>. Юниты: <div id=\"player_units\"></div>. Число ходов выбранного юнита:  <div id=\"unit_steps\"></div></div>";
+				$('#field').append(userlog);
 				
 
-					// подсвечиваем позиции игрока
-					// игроки друг друга не видят, поэтому изначально
-					// будет подсвечена одна позиция
-					var player_pos_x;
-					var player_pos_y;
-					$.post("php/startGame.php", function(data){
-						console.log("Field is painted.");
-						data = JSON.parse(data);
+				// подсвечиваем позиции игрока
+				// игроки друг друга не видят, поэтому изначально
+				// будет подсвечена одна позиция
+				var player_pos_x;
+				var player_pos_y;
+				$.post("php/startGame.php", function(data){
+					console.log("Field is painted.");
+					data = JSON.parse(data);
 						
-						var availableSteps = 0;
-						data.result.units.forEach(function(item, position, cells) {
-							availableSteps += parseInt(item[2],10);
-						})
+					var availableSteps = 0;
+					data.result.units.forEach(function(item, position, cells) {
+						availableSteps += parseInt(item[2],10);
+					})
 						
-						$('#player_units').html(data.result.unit_count);
-						$('#player_steps').html(availableSteps);
-						$('#game_step').html(data.result.game_step);
+					$('#player_units').html(data.result.unit_count);
+					$('#player_steps').html(availableSteps);
+					$('#game_step').html(data.result.game_step);
 						
-						var cells = data.result.cells;
+					var cells = data.result.cells;
 						
-						cells.forEach(function(item, position, cells) {
-							player_pos_x = item[1];
-							player_pos_y = item[2];
+					cells.forEach(function(item, position, cells) {
+						player_pos_x = item[1];
+						player_pos_y = item[2];
 							
-							$('td#cell' + player_pos_x + player_pos_y).html("*<br>");
-							$('td#cell' + player_pos_x + player_pos_y).css("background-color", data.result.cell_color);
+						$('td#cell' + player_pos_x + player_pos_y).html("*<br>");
+						$('td#cell' + player_pos_x + player_pos_y).css("background-color", data.result.cell_color);
 								
-							var units = data.result.units;
-							var cell_id = cells[position][0];
-							var cell_selector = $('td#cell' + player_pos_x + player_pos_y);
+						var units = data.result.units;
+						var cell_id = cells[position][0];
+						var cell_selector = $('td#cell' + player_pos_x + player_pos_y);
 							
-							units.forEach(function(item, position, arr) {
-								var unit_cell_id = units[position][1];																
-								var unit_id = units[position][0];
-								var unit_steps = units[position][2];
-								console.log(unit_id + " " + unit_cell_id);
+						units.forEach(function(item, position, arr) {
+							var unit_cell_id = units[position][1];																
+							var unit_id = units[position][0];
+							var unit_steps = units[position][2];
+							console.log(unit_id + " " + unit_cell_id);
 								
-								if(unit_cell_id == cell_id) {						
-									cell_selector.append("<span class =\"unit\" id=" + player_pos_x + player_pos_y + 	unit_id + ">" + unit_id + "</span>");
-								}
+							if(unit_cell_id == cell_id) {						
+								cell_selector.append("<span class =\"unit\" id=" + player_pos_x + player_pos_y + 	unit_id + ">" + unit_id + "</span>");
+							}
 												
-								var unit_selector = $('span#' + player_pos_x + player_pos_y + unit_id +'.unit');
-								unit_selector.css("border", "1px solid black");
-								unit_selector.css("margin", "2px");
-								unit_selector.css("padding", "2px");													
-								unit_selector.css("background-color", data.result.cell_color);													
+							var unit_selector = $('span#' + player_pos_x + player_pos_y + unit_id +'.unit');
+							unit_selector.css("border", "1px solid black");
+							unit_selector.css("margin", "2px");
+							unit_selector.css("padding", "2px");													
+							unit_selector.css("background-color", data.result.cell_color);													
 																	
-								});
+							});
 							
-							})
+						})
 					
-						// механизм ходов
+					// механизм ходов
 						
-						if(availableSteps != 0) {
-							$('.unit').bind('click', function() {	
-							$('.unit').off();
-							var unit = $(this);
+					if(availableSteps != 0) {
+						$('.unit').bind('click', function() {	
+						$('.unit').off();
+						var unit = $(this);
 							
-							var unit_selector = unit.attr('id').split("");
+						var unit_selector = unit.attr('id').split("");
 							
-							var unit_id = unit_selector[2];
-							for(var i = 3; i < unit_selector.length; i++) {
-								//alert(unit_selector[i]);
-								unit_id += unit_selector[i];
-							}
-							var unit_x = unit_selector[0];
-							var unit_y = unit_selector[1];
-							//alert(unit_selector);
+						var unit_id = unit_selector[2];
+						for(var i = 3; i < unit_selector.length; i++) {
+							//alert(unit_selector[i]);
+							unit_id += unit_selector[i];
+						}
+						var unit_x = unit_selector[0];
+						var unit_y = unit_selector[1];
+						//alert(unit_selector);
 							 
-							var cell_current = $('td#cell' + unit_x + unit_y + '.cell');
-							var cell_current_id = $('td#cell' + unit_x + unit_y + '.cell').attr('id');
+						var cell_current = $('td#cell' + unit_x + unit_y + '.cell');
+						var cell_current_id = $('td#cell' + unit_x + unit_y + '.cell').attr('id');
 							
-							unit.css("border-color","red");
-							var units = data.result.units;		
-							var unit_steps;
+						unit.css("border-color","red");
+						var units = data.result.units;		
+						var unit_steps;
 
-							units.forEach(function(item, position, arr) {
-								if(units[position][0] == unit_id) {
-									unit_steps = units[position][2];
-								}
-							})
-							//alert(unit_steps);
-							if(unit_steps == 0) {
-								alert("Нет доступных ходов. Выберите другого юнита.");
-								ajax_page_status_update();
+						units.forEach(function(item, position, arr) {
+							if(units[position][0] == unit_id) {
+								unit_steps = units[position][2];
 							}
+						})
+						//alert(unit_steps);
+						if(unit_steps == 0) {
+							alert("Нет доступных ходов. Выберите другого юнита.");
+							ajax_page_status_update();
+						}
 							
-							console.log("unit " + unit_id + " can do " + unit_steps + " steps");
-							$("#unit_steps").html(unit_steps);
+						console.log("unit " + unit_id + " can do " + unit_steps + " steps");
+						$("#unit_steps").html(unit_steps);
 							
 							
-							$('.cell').click(function() {								
-							var cell_new = $(this);
-							var cell_new_id = $(this).attr('id');
-							var cell_new_x = cell_new_id.split("")[4];
-							var cell_new_y = cell_new_id.split("")[5];								
+						$('.cell').click(function() {								
+						var cell_new = $(this);
+						var cell_new_id = $(this).attr('id');
+						var cell_new_x = cell_new_id.split("")[4];
+						var cell_new_y = cell_new_id.split("")[5];								
 							
 								
-							var path = Math.sqrt((cell_new_x - unit_x)*(cell_new_x - unit_x)+(cell_new_y - unit_y)*(cell_new_y - unit_y));
-							path = Math.round(path);	
+						var path = Math.sqrt((cell_new_x - unit_x)*(cell_new_x - unit_x)+(cell_new_y - unit_y)*(cell_new_y - unit_y));
+						path = Math.round(path);	
 								
-							//console.log(data.result.units[0][2]);
+						//console.log(data.result.units[0][2]);
 																															
 					
-							if(path != 0) {
-								if(path <= $("#unit_steps").text()) {												
+						if(path != 0) {
+							if(path <= $("#unit_steps").text()) {												
 								
-									console.log("|path| = " + path);
-									var comp = $("#unit_steps").text();
-									$("#unit_steps").html(comp-path);
+								console.log("|path| = " + path);
+								var comp = $("#unit_steps").text();
+								$("#unit_steps").html(comp-path);
 										
-									var remain = $("#unit_steps").text();	
-									console.log("remain of steps = " + remain);
+								var remain = $("#unit_steps").text();	
+								console.log("remain of steps = " + remain);
 										
-									if(remain == 0) {
-										unit.off();
-									}							
-									if(cell_new_id != cell_current_id) {
-										var totalSteps = $('#player_steps').text();	
-										allSteps = totalSteps-path;	
-										$('#player_steps').html(allSteps);	
+								if(remain == 0) {
+									unit.off();
+								}							
+								if(cell_new_id != cell_current_id) {
+									var totalSteps = $('#player_steps').text();	
+									allSteps = totalSteps-path;	
+									$('#player_steps').html(allSteps);	
 										
-										$('#unit_steps').html(remain);
+									$('#unit_steps').html(remain);
 										
-										console.log("|path| = " + path + ", moved to (" + cell_new_x + " " + cell_new_y + "), all steps: " + allSteps);
+									console.log("|path| = " + path + ", moved to (" + cell_new_x + " " + cell_new_y + "), all steps: " + allSteps);
 										
-										cell_new.css("background", data.result.cell_color)
-										cell_new.append(unit);
+									cell_new.css("background", data.result.cell_color)
+									cell_new.append(unit);
 										
-										unit.attr('id',cell_new_x + '' + cell_new_y + '' + unit_id);								
-										$('.cell').unbind();
-										unit.css("border-color","black");
+									unit.attr('id',cell_new_x + '' + cell_new_y + '' + unit_id);								
+									$('.cell').unbind();
+									unit.css("border-color","black");
 											
-										// тут ajax-запрос на обновление инфы в базе (драки тоже тут будут)
-										//alert(unit_id + " " + unit_steps + " " + cell_new_x + " " + cell_new_y);
-										$.post("php/actions/doStep.php", {'unit_id' : unit_id, 'unit_steps' : remain, 'unit_pos_x' : cell_new_x, 'unit_pos_y' : cell_new_y, 'units_count' : data.result.unit_count}, function(data){
-											data = JSON.parse(data);
-											alert(data.result);
-											ajax_page_status_update();
-										})	
-										// ajax_page_status_update();
-										}								
-								} else {
-									cell_new.css("background", "red");
-									console.log("|path| = " + path);
-									setTimeout(function() {cell_new.css("background", "white")}, 5000);	// тут поменять белый на цвет клетки, на которую мы нажали
+									// тут ajax-запрос на обновление инфы в базе (драки тоже тут будут)
+									//alert(unit_id + " " + unit_steps + " " + cell_new_x + " " + cell_new_y);
+									$.post("php/actions/doStep.php", {'unit_id' : unit_id, 'unit_steps' : remain, 'unit_pos_x' : cell_new_x, 'unit_pos_y' : cell_new_y, 'units_count' : data.result.unit_count}, function(data){
+										data = JSON.parse(data);
+										alert(data.result);
+										ajax_page_status_update();
+									})	
+									// ajax_page_status_update();
+									}								
+							} else {
+								cell_new.css("background", "red");
+								console.log("|path| = " + path);
+								setTimeout(function() {cell_new.css("background", "white")}, 5000);	// тут поменять белый на цвет клетки, на которую мы нажали
 									
-								}
 							}
-							if($('#player_steps').text() == 0) {
-								// тут будет запрос на обновление статуса игрока (закончил ход) и увеличение кона на 1
-								$('#userbar').append("Доступные ходы кончичилсь. Ждем, когда сходят другие игроки.");
-								setTimeout(ajax_page_status_update, 5000);
-							}
-																							
-							})							
-					
-							})
 						}
-						
-					})
+																						
+						})							
 					
-				} else {
-					// Ожидание игры, pageStatus = 1
-					console.log("pageStatus = 1");
-					$('#autorize').hide();
-					$('#gamewait').show();	
-					$('#field').hide();
-					$('#userbar').show();
-					if(res.p_gid != null && res.g_players_num != null) {
-						$('.game_number').html("Номер вашей игры: " + res.p_gid);
-						if(res.g_players_needed != null) {
-							$('.game_needed_players').html("Ждем " + res.g_players_needed + " игроков");
-						} else {
-							$('.game_needed_players').html("Ждем " + (5 - res.g_players_num) + " игроков");
-						}
-					}
-					else {
-						$.post("php/gameSelect.php", function(data){
-							ajax_page_status_update();
 						})
+					} else {
+						// тут будет запрос на обновление статуса игрока (закончил ход) и увеличение кона на 1
+						$.post("php/actions/switchGameStep.php", function(data) {
+							data = JSON.parse(data);
+							// если у игроков еще остались ходы
+							if(data.result == -1) {
+								$('#errorbar').html("Доступные ходы кончичилсь. Ждем, когда сходят другие игроки.");
+								setTimeout(function() {
+									$.post("php/getUserData.php", ajax_page_status_update);
+								}, 5000);
+							} else {
+								// у игроков нет ходов, ход переключен
+								$.post("php/getUserData.php", ajax_page_status_update);
+							}
+						});							
+					
+					}
+						
+				})
+					
+			} else {
+					// Ожидание игры, pageStatus = 1
+				console.log("pageStatus = 1");
+				$('#autorize').hide();
+				$('#gamewait').show();	
+				$('#field').hide();
+				$('#userbar').show();
+				if(res.p_gid != null && res.g_players_num != null) {
+					$('.game_number').html("Номер вашей игры: " + res.p_gid);
+					if(res.g_players_needed != null) {
+						$('.game_needed_players').html("Ждем " + res.g_players_needed + " игроков");
+					} else {
+						$('.game_needed_players').html("Ждем " + (5 - res.g_players_num) + " игроков");
 					}
 				}
+				else {
+					$.post("php/gameSelect.php", function(data){
+						ajax_page_status_update();
+					})
+				}
+			}
 				// управление обновлением страницы
 				//setTimeout(ajax_page_status_update, 5000);
 			} else {
@@ -245,9 +255,8 @@ $(document).ready(function(){
 					ajax_auth();
 				}); 				
 			}
-		}) 
-		
-	}
+		}
+	
 	
     $("#user_exit_button").click(function(){ 
 		$.post("php/exit.php", function(){

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Ноя 23 2019 г., 11:58
+-- Время создания: Ноя 23 2019 г., 17:54
 -- Версия сервера: 10.4.8-MariaDB
 -- Версия PHP: 7.3.10
 
@@ -44,11 +44,17 @@ CREATE TABLE `cell` (
 --
 
 INSERT INTO `cell` (`cell_id`, `cell_game_id`, `cell_resource_id`, `cell_x`, `cell_y`, `cell_shield`, `player_id`, `cell_under_siege`) VALUES
-(558, 50, 5, 3, 0, 0, 46, 0),
-(559, 50, 5, 0, 4, 0, 47, 0),
-(560, 50, 5, 3, 8, 0, 48, 0),
-(561, 50, 5, 8, 6, 0, 49, 0),
-(562, 50, 5, 8, 2, 0, 50, 0);
+(576, 50, 5, 3, 0, 0, 46, 0),
+(577, 50, 5, 0, 4, 0, 47, 0),
+(578, 50, 5, 3, 8, 0, 48, 0),
+(579, 50, 5, 8, 6, 0, 49, 0),
+(580, 50, 5, 8, 2, 0, 50, 0),
+(581, 50, 5, 3, 1, 0, 46, 0),
+(582, 50, 5, 3, 4, 0, 46, 0),
+(583, 50, 5, 4, 1, 0, 46, 0),
+(584, 50, 5, 1, 1, 0, 46, 0),
+(585, 50, 5, 8, 0, 0, 46, 0),
+(586, 50, 5, 3, 3, 0, 46, 0);
 
 -- --------------------------------------------------------
 
@@ -71,7 +77,7 @@ CREATE TABLE `game` (
 --
 
 INSERT INTO `game` (`game_id`, `game_status`, `game_time_begin`, `game_last_step_time`, `game_step`, `game_players`, `game_field_is_painted`) VALUES
-(50, 1, NULL, NULL, 1, 5, 1);
+(50, 1, NULL, NULL, 2, 5, 1);
 
 -- --------------------------------------------------------
 
@@ -96,11 +102,11 @@ CREATE TABLE `player` (
 --
 
 INSERT INTO `player` (`player_id`, `player_name`, `player_game_id`, `player_color`, `player_steps`, `player_pass`, `player_ready`, `player_wins`, `player_falls`) VALUES
-(46, 'habib', 50, '#177347', NULL, '148822', 1, 0, 0),
-(47, 'tuger', 50, '#52c3f5', NULL, '148822', 1, 0, 0),
-(48, 'connor', 50, '#7c01ee', NULL, '148822', 0, 0, 0),
-(49, 'mcgregor', 50, '#caae7e', NULL, '148822', 0, 0, 0),
-(50, 'epta', 50, '#824516', NULL, '148822', 0, 0, 0);
+(46, 'habib', 50, '#2dfc2e', NULL, '148822', 1, 1, 0),
+(47, 'tuger', 50, '#1f7fee', NULL, '148822', 1, 0, 1),
+(48, 'connor', 50, '#5d289a', NULL, '148822', 1, 0, 0),
+(49, 'mcgregor', 50, '#9d7bb7', NULL, '148822', 1, 0, 0),
+(50, 'epta', 50, '#952ec8', NULL, '148822', 1, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -142,12 +148,20 @@ CREATE TABLE `unit` (
 --
 
 INSERT INTO `unit` (`unit_id`, `unit_player_id`, `unit_cell_id`, `unit_steps`) VALUES
-(274, 47, 559, 5),
-(275, 47, 559, 5),
-(276, 47, 559, 5),
-(277, 46, 558, 5),
-(278, 46, 558, 5),
-(279, 46, 558, 5);
+(289, 47, 577, 5),
+(290, 47, 577, 5),
+(292, 46, 585, 5),
+(293, 46, 586, 5),
+(294, 46, 584, 5),
+(295, 48, 578, 5),
+(296, 48, 578, 5),
+(297, 48, 578, 5),
+(298, 49, 579, 5),
+(299, 49, 579, 5),
+(300, 49, 579, 5),
+(301, 50, 580, 5),
+(302, 50, 580, 5),
+(303, 50, 580, 5);
 
 --
 -- Индексы сохранённых таблиц
@@ -197,19 +211,19 @@ ALTER TABLE `unit`
 -- AUTO_INCREMENT для таблицы `cell`
 --
 ALTER TABLE `cell`
-  MODIFY `cell_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=563;
+  MODIFY `cell_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=587;
 
 --
 -- AUTO_INCREMENT для таблицы `game`
 --
 ALTER TABLE `game`
-  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT для таблицы `player`
 --
 ALTER TABLE `player`
-  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT для таблицы `resources`
@@ -221,7 +235,7 @@ ALTER TABLE `resources`
 -- AUTO_INCREMENT для таблицы `unit`
 --
 ALTER TABLE `unit`
-  MODIFY `unit_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=280;
+  MODIFY `unit_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=304;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

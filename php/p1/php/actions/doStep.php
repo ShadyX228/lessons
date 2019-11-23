@@ -85,7 +85,13 @@
 				mysqli_query($link, "UPDATE unit SET unit_cell_id = $cellId WHERE unit_id = $unit_id"); // двигаем юнита на клетку
 			
 				mysqli_query($link, "UPDATE unit SET unit_steps = $unit_steps WHERE unit_id = $unit_id");
+				
 				// увеличить счетики побед и поражений победилея и проигравшего
+				$wins_player++;
+				mysqli_query($link, "UPDATE player SET player_wins = $wins_player WHERE player_id = $pid");			
+				$falls_enemy++;
+				mysqli_query($link, "UPDATE player SET player_falls = $falls_enemy WHERE player_id = $cellPid");
+				
 				array_push($res,"Вражеская клетка. Победа");							
 															
 			} else if($win_player == $win_enemy) {
@@ -93,7 +99,13 @@
 				array_push($res,"Вражеская клетка. Ничья");		
 			} else {
 				mysqli_query($link, "DELETE FROM unit WHERE unit_id = $unit_id");
-				// увеличить счетики побед и поражений победилея и проигравшего
+				
+				// увеличить счетики побед и поражений победителя и проигравшего
+				$wins_enemy++;
+				mysqli_query($link, "UPDATE player SET player_wins = $wins_enemy WHERE player_id = $cellPid");			
+				$falls_player++;
+				mysqli_query($link, "UPDATE player SET player_falls = $falls_player WHERE player_id = $pid");
+				
 				array_push($res,"Вражеская клетка. Поражение. Юнит потерян.");	
 			}
 			
