@@ -125,7 +125,7 @@ $(document).ready(function(){
 						//alert(unit_steps);
 						if(unit_steps == 0) {
 							alert("Нет доступных ходов. Выберите другого юнита.");
-							ajax_page_status_update();
+							$.post("php/getUserData.php", ajax_page_status_update);
 						}
 							
 						console.log("unit " + unit_id + " can do " + unit_steps + " steps");
@@ -179,7 +179,7 @@ $(document).ready(function(){
 									$.post("php/actions/doStep.php", {'unit_id' : unit_id, 'unit_steps' : remain, 'unit_pos_x' : cell_new_x, 'unit_pos_y' : cell_new_y, 'units_count' : data.result.unit_count}, function(data){
 										data = JSON.parse(data);
 										alert(data.result);
-										ajax_page_status_update();
+										$.post("php/getUserData.php", ajax_page_status_update);
 									})	
 									// ajax_page_status_update();
 									}								
@@ -231,7 +231,7 @@ $(document).ready(function(){
 				}
 				else {
 					$.post("php/gameSelect.php", function(data){
-						ajax_page_status_update();
+						$.post("php/getUserData.php", ajax_page_status_update);
 					})
 				}
 			}
@@ -260,7 +260,7 @@ $(document).ready(function(){
 	
     $("#user_exit_button").click(function(){ 
 		$.post("php/exit.php", function(){
-			ajax_page_status_update();
+			$.post("php/getUserData.php", ajax_page_status_update);
 		})			
     }); 
     $("#show_form").click(function(){ 
@@ -309,7 +309,7 @@ $(document).ready(function(){
 			if(data.length > 0) {
 				data = JSON.parse(data);
 				if(data.error.length == 0) {
-					ajax_page_status_update();
+					$.post("php/getUserData.php", ajax_page_status_update);
 					$('#errorbar').html("");
 					$('#login').html(login);
 				}
