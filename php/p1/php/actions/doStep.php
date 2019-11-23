@@ -5,6 +5,7 @@
 	include "../model.php";
 	session_start();
 	
+	
 	$gid = $_SESSION["game_id"];
 	$pid = $_SESSION["pid"];
 	$unit_id = $_POST['unit_id'];
@@ -16,6 +17,7 @@
 	//echo $unit_steps;
 	//echo $unit_pos_x;
 	//echo $unit_pos_y;
+	$res = array();	
 	
 	// проверяем, есть ли в бд запись о такой клетке
 	// если есть, то она либо занята другим игроком, либо на ней есть ресурсы
@@ -27,6 +29,7 @@
 		mysqli_query($link, "INSERT INTO cell (cell_game_id, cell_resource_id, cell_x, cell_y, cell_shield, player_id) VALUES ($gid, 5, $unit_pos_x, $unit_pos_y, 0, $pid)");
 		$cellId = mysqli_insert_id($link);
 		mysqli_query($link, "UPDATE unit SET unit_cell_id = $cellId, unit_steps = $unit_steps WHERE unit_id = $unit_id");
+		array_push($res,"Клетка занята вами");	
 	} else {
 		// не пустая. Возможны варианты
 		// клетка принадлежит игроку
@@ -34,9 +37,13 @@
 		$cellPid = $checkCell['player_id'];
 		if($cellPid == $pid) {
 			mysqli_query($link, "UPDATE unit SET unit_cell_id = $cellId, unit_steps = $unit_steps WHERE unit_id = $unit_id");
+			array_push($res,"Переход на свою клетку");	
 		} else if($cellPid == null) {
 			// клетка с ресурсами, не занятая
 			// проверить, что на клетке за ресурс и дать игроку бонусы
+			// тут нужно вызвать функцию, которая назначит ресурс и выдаст игроку бонус от  него
+			
+			array_push($res,"Клетка занята вами, получен бонус от ресурса");	
 		}
 		else {
 			// чужая клетка
@@ -69,16 +76,30 @@
 			
 			$win_enemy = (1+$wins_enemy)*$units_enemy*$territory_enemy/((1+$falls_enemy)*1000);
 			
-			echo $win_player . " " . $win_enemy;
+			//echo $win_player . " " . $win_enemy;
 			
 			// сделать сравнение
+			if($win_player > $win_enemy) { // победа
+				mysqli_query($link, "DELETE FROM unit WHERE unit_cell_id = $cellId AND unit_player_id = $cellPid"); // убиваем вражеские
+				mysqli_query($link, "UPDATE cell SET player_id = $pid WHERE cell_id = $cellId;"); // передаем клетку победителю
+				mysqli_query($link, "UPDATE unit SET unit_cell_id = $cellId WHERE unit_id = $unit_id"); // двигаем юнита на клетку
 			
-			// поставить юнит игрока на клетку в случае победы и убить все вражеские
-			// если игрок проиграл, то убить юнит, который должен был зайти на клетку
+				mysqli_query($link, "UPDATE unit SET unit_steps = $unit_steps WHERE unit_id = $unit_id");
+				// увеличить счетики побед и поражений победилея и проигравшего
+				array_push($res,"Вражеская клетка. Победа");							
+															
+			} else if($win_player == $win_enemy) {
+				mysqli_query($link, "UPDATE unit SET unit_steps = $unit_steps WHERE unit_id = $unit_id");
+				array_push($res,"Вражеская клетка. Ничья");		
+			} else {
+				mysqli_query($link, "DELETE FROM unit WHERE unit_id = $unit_id");
+				// увеличить счетики побед и поражений победилея и проигравшего
+				array_push($res,"Вражеская клетка. Поражение. Юнит потерян.");	
+			}
 			
-			// можно будет запаковать в json сообщение для юзверя
 			
 			
 		}
 	}
+	echo json_encode(array("result" => $res));		
 ?>

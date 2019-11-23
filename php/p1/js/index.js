@@ -177,7 +177,9 @@ $(document).ready(function(){
 											
 										// тут ajax-запрос на обновление инфы в базе (драки тоже тут будут)
 										//alert(unit_id + " " + unit_steps + " " + cell_new_x + " " + cell_new_y);
-										$.post("php/actions/doStep.php", {'unit_id' : unit_id, 'unit_steps' : remain, 'unit_pos_x' : cell_new_x, 'unit_pos_y' : cell_new_y, 'units_count' : data.result.unit_count}, function(){
+										$.post("php/actions/doStep.php", {'unit_id' : unit_id, 'unit_steps' : remain, 'unit_pos_x' : cell_new_x, 'unit_pos_y' : cell_new_y, 'units_count' : data.result.unit_count}, function(data){
+											data = JSON.parse(data);
+											alert(data.result);
 											ajax_page_status_update();
 										})	
 										// ajax_page_status_update();
@@ -191,7 +193,8 @@ $(document).ready(function(){
 							}
 							if($('#player_steps').text() == 0) {
 								// тут будет запрос на обновление статуса игрока (закончил ход) и увеличение кона на 1
-								ajax_page_status_update();
+								$('#userbar').append("Доступные ходы кончичилсь. Ждем, когда сходят другие игроки.");
+								setTimeout(ajax_page_status_update, 5000);
 							}
 																							
 							})							
